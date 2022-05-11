@@ -74,7 +74,7 @@ public class ClientUi {
 
         public TextLog() {
             this.setForeground(Color.WHITE);
-            Arrays.fill(lines, ".");
+            Arrays.fill(lines, " ");
             this.lines[0] = "<html><pre>";
             this.lines[lines.length-1] = "</pre></html>";
             this.setText(String.join("\n", lines));
@@ -87,6 +87,11 @@ public class ClientUi {
             this.lines[1] = string;
             this.setText(String.join("\n", lines));
         }
+    }
+
+    public static void main(String[] args){
+        ClientUi clientUi = new ClientUi();
+        clientUi.start();
     }
 
 }
