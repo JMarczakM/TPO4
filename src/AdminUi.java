@@ -1,15 +1,14 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
+import java.io.IOException;
 
 public class AdminUi {
     AdminUi.MyButton[] buttons = new MyButton[8];
-    JLabel responce;
+    JLabel response;
     public AdminUi() {
     }
 
-    public void start(){
+    public void start(NewsServer newsServer){
         JFrame frame = new JFrame("App");
         JPanel panel = new JPanel(new GridLayout(1,2));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -29,15 +28,15 @@ public class AdminUi {
             System.out.println("Delete");
             //todo logic
         });
-        this.responce = new JLabel("");
-        responce.setForeground(Color.white);
+        this.response = new JLabel("");
+        response.setForeground(Color.white);
         innerRightButtonPanel.add(irbutton1);
         innerRightButtonPanel.add(irbutton2);
         rightPanel.add(innerRightButtonPanel);
 
         JTextField textField = new JTextField(20);
         rightPanel.add(textField);
-        rightPanel.add(responce);
+        rightPanel.add(response);
 
         rightPanel.setBackground(Color.darkGray);
 
@@ -88,8 +87,9 @@ public class AdminUi {
         }
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException {
         AdminUi adminUi = new AdminUi();
-        adminUi.start();
+        NewsServer newsServer = new NewsServer();
+        adminUi.start(newsServer);
     }
 }

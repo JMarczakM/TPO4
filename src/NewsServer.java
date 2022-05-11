@@ -1,25 +1,29 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class NewsServer {
-    private ServerSocket serverSocket;
-    private String name;
-    private ArrayList<String> news;
+    private HashMap<String, ArrayList<String>> news;
 
-    public NewsServer(String name, String[] news) throws IOException {
-        this.serverSocket = new ServerSocket(0);
-        this.name = name;
-        this.news = new ArrayList<>();
-        this.news.addAll(List.of(news));
+    public NewsServer(HashMap<String, ArrayList<String>> news) throws IOException {
+        this.news = news;
+    }
+
+    public NewsServer() {
+        this.news = new HashMap<>();
     }
 
     public String[] getNews(){
-        return news.toArray(new String[0]);
+        return new String[]{"todo","placeholder"};
     }
 
     public void addNews(String s){
-        news.add(s);
+
+    }
+
+    public void deleteNews(String s){
+
     }
 }
