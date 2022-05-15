@@ -1,65 +1,41 @@
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class AdminUi {
-    AdminUi.MyButton[] buttons = new MyButton[8];
-    JLabel response;
-    public AdminUi() {
+    private TextLog textLog;
+    private Admin admin;
+    private JTextField textField;
+
+    public AdminUi(Admin admin) {
+        this.admin = admin;
     }
 
-    public void start(NewsServer newsServer){
+    public void start(){
         JFrame frame = new JFrame("App");
         JPanel panel = new JPanel(new GridLayout(1,2));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 500);
-        JPanel leftPanel = new JPanel(new GridLayout(4,2));
+        JPanel leftPanel = new JPanel(new GridLayout(4,1));
         JPanel rightPanel = new JPanel();
 
-        JPanel innerRightButtonPanel = new JPanel();
-        JButton irbutton1 = new JButton("Add");
-        irbutton1.addActionListener(e -> {
-            System.out.println("Add");
-            //todo logic
-        });
-
-        JButton irbutton2 = new JButton("Delete");
-        irbutton2.addActionListener(e -> {
-            System.out.println("Delete");
-            //todo logic
-        });
-        this.response = new JLabel("");
-        response.setForeground(Color.white);
-        innerRightButtonPanel.add(irbutton1);
-        innerRightButtonPanel.add(irbutton2);
-        rightPanel.add(innerRightButtonPanel);
-
-        JTextField textField = new JTextField(20);
-        rightPanel.add(textField);
-        rightPanel.add(response);
-
+        textLog = new TextLog();
+        textLog.setForeground(Color.WHITE);
+        textLog.setSize(rightPanel.getSize());
         rightPanel.setBackground(Color.darkGray);
 
+        rightPanel.add(textLog);
 
+        MyButton button1 = new MyButton("create", textLog);
+        MyButton button2 = new MyButton("replace", textLog);
+        MyButton button3 = new MyButton("sendToAll", textLog);
+        textField = new JTextField(30);
 
-        this.buttons[0] = new AdminUi.MyButton("Politics", buttons);
-        this.buttons[1] = new AdminUi.MyButton("Sports", buttons);
-        this.buttons[2] = new AdminUi.MyButton("Music", buttons);
-        this.buttons[3] = new AdminUi.MyButton("Nature", buttons);
-        this.buttons[4] = new AdminUi.MyButton("Games", buttons);
-        this.buttons[5] = new AdminUi.MyButton("Romance", buttons);
-        this.buttons[6] = new AdminUi.MyButton("Movies", buttons);
-        this.buttons[7] = new AdminUi.MyButton("Motorisation", buttons);
-
-        leftPanel.add(buttons[0]);
-        leftPanel.add(buttons[1]);
-        leftPanel.add(buttons[2]);
-        leftPanel.add(buttons[3]);
-        leftPanel.add(buttons[4]);
-        leftPanel.add(buttons[5]);
-        leftPanel.add(buttons[6]);
-        leftPanel.add(buttons[7]);
-
+        leftPanel.add(button1);
+        leftPanel.add(button2);
+        leftPanel.add(button3);
+        leftPanel.add(textField);
         panel.add(leftPanel);
         panel.add(rightPanel);
 
@@ -70,26 +46,49 @@ public class AdminUi {
 
     private class MyButton extends Button
     {
-        boolean active = false;
 
-        public MyButton(String name, MyButton[] buttons) throws HeadlessException {
+        public MyButton(String name, TextLog textLog) throws HeadlessException {
             super(name);
-            this.setBackground(Color.red);
+            this.setBackground(Color.gray);
+
             this.addActionListener(e -> {
-                for (MyButton m: buttons) {
-                    m.active = false;
-                    m.setBackground(Color.red);
-                }
-                this.setBackground(Color.green);
-                //todo button pressed logic
-                this.active = true;
+
+            textLog.write(name+" button pressed");
+            try {
+                send(name+" "+textField.getText());
+                textField.setText("");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
             });
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        AdminUi adminUi = new AdminUi();
-        NewsServer newsServer = new NewsServer();
-        adminUi.start(newsServer);
+    private class TextLog extends JLabel{
+        private String[] lines = new String[27];
+
+        public TextLog() {
+            this.setForeground(Color.WHITE);
+            Arrays.fill(lines, " ");
+            this.lines[0] = "<html><pre>";
+            this.lines[lines.length-1] = "</pre></html>";
+            this.setText(String.join("\n", lines));
+        }
+
+        public void write(String string){
+            for (int i = lines.length-2; i > 1; i--) {
+                this.lines[i] = lines[i-1];
+            }
+            this.lines[1] = string;
+            this.setText(String.join("\n", lines));
+        }
+    }
+
+    public void printToTextLog(String s){
+        textLog.write(s);
+    }
+
+    public void send(String s) throws IOException {
+        admin.printToServer(s);
     }
 }

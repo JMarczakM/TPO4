@@ -1,43 +1,39 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.Arrays;
 
 public class ClientUi {
-    public ClientUi() {}
+    private TextLog textLog;
+    private Client client;
+    private JTextField textField;
+
+    public ClientUi(Client client) {
+        this.client = client;
+    }
 
     public void start(){
         JFrame frame = new JFrame("App");
         JPanel panel = new JPanel(new GridLayout(1,2));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 500);
-        JPanel leftPanel = new JPanel(new GridLayout(4,2));
+        JPanel leftPanel = new JPanel(new GridLayout(3,1));
         JPanel rightPanel = new JPanel();
 
-        TextLog textLog = new TextLog();
+        textLog = new TextLog();
         textLog.setForeground(Color.WHITE);
         textLog.setSize(rightPanel.getSize());
         rightPanel.setBackground(Color.darkGray);
 
         rightPanel.add(textLog);
 
-        MyButton button1 = new MyButton("Politics", textLog);
-        MyButton button2 = new MyButton("Sports", textLog);
-        MyButton button3 = new MyButton("Music", textLog);
-        MyButton button4 = new MyButton("Nature", textLog);
-        MyButton button5 = new MyButton("Games", textLog);
-        MyButton button6 = new MyButton("Romance", textLog);
-        MyButton button7 = new MyButton("Movies", textLog);
-        MyButton button8 = new MyButton("Motorisation", textLog);
+        MyButton button1 = new MyButton("subscribe", textLog);
+        MyButton button2 = new MyButton("unsubscribe", textLog);
+        textField = new JTextField(30);
 
         leftPanel.add(button1);
         leftPanel.add(button2);
-        leftPanel.add(button3);
-        leftPanel.add(button4);
-        leftPanel.add(button5);
-        leftPanel.add(button6);
-        leftPanel.add(button7);
-        leftPanel.add(button8);
-
+        leftPanel.add(textField);
         panel.add(leftPanel);
         panel.add(rightPanel);
 
@@ -48,23 +44,20 @@ public class ClientUi {
 
     private class MyButton extends Button
     {
-        boolean active = false;
 
         public MyButton(String name, TextLog textLog) throws HeadlessException {
             super(name);
-            this.setBackground(Color.red);
+            this.setBackground(Color.gray);
 
             this.addActionListener(e -> {
-                this.active = !active;
-                if(active){
-                    this.setBackground(Color.green);
-                    textLog.write(name+" button pressed");
-                    //todo button pressed logic
-                } else {
-                    this.setBackground(Color.red);
-                    textLog.write(name+" button unpressed");
-                    //todo button unpressed logic
-                }
+
+            textLog.write(name+" button pressed");
+            try {
+                send(name+" "+textField.getText());
+                textField.setText("");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
             });
         }
     }
@@ -89,9 +82,11 @@ public class ClientUi {
         }
     }
 
-    public static void main(String[] args){
-        ClientUi clientUi = new ClientUi();
-        clientUi.start();
+    public void printToTextLog(String s){
+        textLog.write(s);
     }
 
+    public void send(String s) throws IOException {
+        client.printToServer(s);
+    }
 }
